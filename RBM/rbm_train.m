@@ -61,3 +61,4 @@ function [M , b, c , errors] = rbm_train(X, M, b, c, cd_k, epsilon, alpha, lambd
         e = e + 1;
     end
 end
+% comment
