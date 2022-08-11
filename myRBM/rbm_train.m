@@ -1,7 +1,8 @@
-function [M , b, c , errors] = rbm_train(X, M, b, c, cd_k, epsilon, alpha, lambda, max_epochs)
+function [M, b, c, errors, energies] = rbm_train(X, M, b, c, cd_k, epsilon, max_epochs)
     %% initializing variables
     e = 0; % ~index variable (epochs)
-    errors = [Inf]; % = infinite
+    errors = [Inf];
+    energies = [Inf];
 
     Nh = size(c, 1); % num hidden
     Ni = size(b, 1); % num input
@@ -24,6 +25,10 @@ function [M , b, c , errors] = rbm_train(X, M, b, c, cd_k, epsilon, alpha, lambd
             % k-step (cd_k) contrastive divergence
             [h0, v0, vk, hk] = rbm_contrastive_divergence(M, b, c, cd_k, X(i,:)');
             
+            % compute energy
+            % energy = -(M * hk + b); original code
+            energy = get_energy(vk, hk, M, b, c);
+
             % compute gradient
             [Mgrad, bgrad, cgrad] = rbm_gradient(v0, h0, vk, hk);
             
@@ -43,7 +48,7 @@ function [M , b, c , errors] = rbm_train(X, M, b, c, cd_k, epsilon, alpha, lambd
             b = b + epsilon * deltab;
             c = c + epsilon * deltac;
 
-            % weight decay (penalizes large weighs to prevent overfitting)
+            % weight decay (penalizes large weights to prevent overfitting)
             % M = M - lambda * M;
             
             % error metric
@@ -51,13 +56,16 @@ function [M , b, c , errors] = rbm_train(X, M, b, c, cd_k, epsilon, alpha, lambd
         end
         
         % mean error over tr samples
-        errors(end + 1) = error / Nd; 
+        errors(end + 1) = error / Nd;
 
-        fprintf('- epoch %d, error: %f\n', e, errors(end));
+        % mean energy over tr samples
+        energies(end + 1) = sum(energy);
+
+        fprintf('- epoch %d, error: %f, energy: %f\n', e, errors(end), energies(end));
+
         if e > max_epochs
             break
         end
-        % comment
         e = e + 1;
     end
 end

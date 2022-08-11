@@ -4,6 +4,7 @@ function inputActivation = test_input(M, cd_k, c, b, x)
     Ni = size(b, 1);
     sigmoid = @(a) 1.0 ./ (1.0 + exp(-a)); % sigmoid activation function (where a = energy)
     
+
     % clamp training vector to test image
     v0 = x';
     

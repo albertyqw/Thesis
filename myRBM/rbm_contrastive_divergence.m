@@ -1,4 +1,4 @@
-function [h0, v0, vk, hk] = rbm_contrastive_divergence(M, b, c, cd_k, x)
+function [h0, v0, vk, hk] = rbm_contrastive_divergence(M, b, c, cdk, x)
     Nh = size(c, 1);
     Ni = size(b, 1);
     sigmoid = @(a) 1.0 ./ (1.0 + exp(-a)); % sigmoid activation function (where a = energy)
@@ -13,7 +13,7 @@ function [h0, v0, vk, hk] = rbm_contrastive_divergence(M, b, c, cd_k, x)
     vk = v0;
     hk = h0;
     % negative phase
-    for k = 1:cd_k % k-step CD
+    for k = 1:cdk % k-step CD
         % update visible units to get reconstruction
         p_vkhk = sigmoid(M * hk + b); % backward: probability of visible | hidden
         vk = p_vkhk; % > rand(Ni, 1); (keep probabilistic?)

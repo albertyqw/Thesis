@@ -1,9 +1,9 @@
-%% run with: test_unclamped(M, 10, c, b, v0)
-function inputActivation = test_unclamped(M, cd_k, c, b, v0)      
+function energies = test_unclamped(M, cdk, b, c, v0, nhidden, breadth, cycles)      
     Nh = size(c, 1);
     Ni = size(b, 1);
     sigmoid = @(a) 1.0 ./ (1.0 + exp(-a)); % sigmoid activation function (where a = energy)
-    
+    energies = [Inf];
+
     % clamp training vector to random init image
     % v0 = rand(Ni,1);
     
@@ -13,22 +13,35 @@ function inputActivation = test_unclamped(M, cd_k, c, b, v0)
 
     vk = v0;
     hk = h0;
-    % negative phase
-    for k = 1:cd_k % k-step cd_k (should / could this be Gibbs cycling?)
-        % update visible units to get reconstruction
-        p_vkhk = sigmoid(M * hk + b); % backward: probability of visible | hidden
-        vk = p_vkhk; % > rand(Ni, 1); (keep probabilistic?)
 
-        % update hidden units again
-        p_hkvk = sigmoid(M' * vk + c); % forward: probability of hidden | visible
-        hk = p_hkvk > rand(Nh,1);
-    end
-    
+    % breadth control
+    neuronsOff = randperm(nhidden, int16(nhidden*(1-breadth))); % random permutation of breadth % neurons to turn off
+    neuronsOff = sort(neuronsOff); % order ascending
+
     nexttile
     imshow(reshape(v0, 28, 28)); % reshape test vector
-    title("Original Random Image")
+    title(sprintf("Orig."))
+    
+    for i = 1:cycles % ruminative cycles
+        % negative phase
+        for k = 1:cdk % k-step cd_k (should / could this be Gibbs cycling?)
+            energy = get_energy(vk, hk, M, b, c);
+            % update visible units to get reconstruction
+            p_vkhk = sigmoid(M * hk + b); % backward: probability of visible | hidden...why is this the opposite sign?
+            vk = p_vkhk > rand(Ni, 1); % increased probabilistic, assumption: more stochastic recall - turn off for a more continous output
+    
+            % update hidden units again
+            p_hkvk = sigmoid(M' * vk + c); % forward: probability of hidden | visible
+            hk = p_hkvk > rand(Nh,1);
 
-    nexttile
-    imshow(reshape(vk, 28, 28)); % reshape visible layer
-    title("Reconstructed Image")
+            for n = 1:length(neuronsOff)
+                hk(neuronsOff(n)) = 0;
+            end
+            energies(end + 1) = sum(energy);
+        end
+        
+        nexttile
+        imshow(reshape(vk, 28, 28)); % reshape visible layer
+        title(sprintf("Rum recon., %f", breadth))
+    end
 end

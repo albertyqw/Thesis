@@ -1,15 +1,14 @@
-function [M,b,c, errors] = rbm(epsilon, Ni, trImages)
+function [M, b, c, errors, energies] = rbm(epsilon, Ni, trImages, nhidden, maxEpochs, cdk)
     %% initialize RBM
-    nhidden = 100; % number of hidden units
     [M, b, c] = rbm_init(Ni, nhidden); % weights, biases
     
     %% train RBM
-    max_epochs = 4; % number of training epochs
+    % max_epochs = 5; % number of training epochs
     % epsilon = 0.001; % learning rate
     alpha = 0.5; % momentum - unused
     lambda = 1e-5; % regularization - unused
-    k = 1; % contrastive-divergence steps
-    [M, b, c, errors] = rbm_train(trImages, M, b, c, k, epsilon, alpha, lambda, max_epochs);
+    % cd_k = 2; % contrastive-divergence steps
+    [M, b, c, errors, energies] = rbm_train(trImages, M, b, c, cdk, epsilon, maxEpochs);
     
     %% encoding digits
     % trImgCodes = rbm_encode(trImages, M, b, c); % activate neurons, returns hidden neurons
@@ -23,10 +22,18 @@ function [M,b,c, errors] = rbm(epsilon, Ni, trImages)
     %% error plot
     figure
     plot(1:size(errors, 2), errors);
-    title(sprintf('training error,lambda: %f', lambda));
+    title(sprintf('Training error'));
+    % title(sprintf('training error,lambda: %f', lambda));
     xlabel('epoch');
     ylabel('error');
-    
+
+    %% energies plot
+    figure
+    plot(1:size(energies, 2), energies);
+    title(sprintf('Energies'));
+    % title(sprintf('training error,lambda: %f', lambda));
+    xlabel('epoch');
+    ylabel('energy');
     %% confusion matrices
     % figure
     % title('confusion matrix TR');
@@ -38,11 +45,11 @@ function [M,b,c, errors] = rbm(epsilon, Ni, trImages)
     
     %% hidden unit weights
     figure
+    title(sprintf("Hidden unit weights"))
     hold on
     for i=1:nhidden
        subplot(10, 10, i);
        imshow(reshape(M(:,i), 28, 28));
-       %title(sprintf('unit %d', i));
     end
     hold off
 end
