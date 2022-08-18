@@ -1,5 +1,19 @@
 %% mood
 loadData
+
+nhidden = 100; % number of hidden units - modulate - see Hinton's recipe
+epsilon = 0.005; % meets Hinton's guidelines, seems to be an okay value for our learning
+maxEpochs = 6; % 8; for long % number of training epochs, 6 doesn't completely settle - but learning isn't perfect
+cdk = 1; % contrastive-divergence steps
+
+cBreadth = 0.99; % % of neurons kept on for the control case
+eBreadth = 0.90; % """ for the experimental (trait rumination case)
+acdk = 240; % associative recall k-steps
+rcdk = 40; % rumination k-step
+rCycles = 6; % number of ruminative "cycles" (giving us 4*30=120 total k-steps)
+
+v0 = rand(Ni+28,1); % pure noisy input for rumination, with an extra row
+
 trValence = [];
 tsValence = [];
 % get row and scale
@@ -28,34 +42,92 @@ trImagesL = [trImages, trValence];
 tsImagesL = [tsImages, tsValence]; 
 
 % train
-[M, b, c, errors, energies] = rbm_mood(0.001, Ni+28, trImagesL, 100, 4, 1); % Ni + 28 for labels 
+[M_c, b_c, c_c, errors_c, energies_c] = rbm_mood(epsilon, Ni+28, trImagesL, nhidden, maxEpochs, cdk); % Ni + 28 for labels 
+M_e = M_c; % equalize training
+b_e = b_c;
+c_e = c_c;
+errors_e = errors_c;
 
 % weight heatmap
 figure
 title("weights heatmap")
-heatmap(M);
+heatmap(M_c);
 %% recall tests
 % image reshape first 784
 ts = [4,3,2,19,5,9,12,18,62,8];
 
+pred_error_c = [];
+pred_error_e = [];
+
+T_e = 0.9;
+T_c = 1.1;
+
+figure
 for i = 1:length(ts)
-    [errors, energies] = test_label_input(M, 10, b, c, tsImagesL(ts(i),:), i, "control", 100, 0.99);  
+    [errors_cAR, energies_cAR, val_pred_c] = test_label_input(M_c, acdk, b_c, c_c, tsImagesL(ts(i),:), i, "ctl.", nhidden, cBreadth, T_c);
+    [errors_eAR, energies_eAR, val_pred_e] = test_label_input(M_e, acdk, b_e, c_e, tsImagesL(ts(i),:), i, "exp.", nhidden, eBreadth, T_e);
+    pred_error_c(end+1) = val_pred_c;
+    pred_error_e(end+1) = val_pred_e;
 end
+
+ave_pred_error_c = (sum(abs([0:9]-pred_error_c)))/10;
+ave_pred_error_e = (sum(abs([0:9]-pred_error_e)))/10;
+
+% free recall
+figure
+energies_cFR = test_label_unclamped(M_c, rcdk, b_c, c_c, v0, nhidden, cBreadth, rCycles, T_c);
+energies_eFR = test_label_unclamped(M_e, rcdk, b_e, c_e, v0, nhidden, eBreadth, rCycles, T_e);
 %% phase 2 results
+fprintf("Ave. ctl. predicted error, %f \n", ave_pred_error_c);
+fprintf("Ave. exp. predicted error, %f \n", ave_pred_error_e);
+
 % energy
 figure
-x = 1:size(energies, 2);
-y = energies;
-plot(x,y)
-title(sprintf("energy"))
+subplot(2,1,1)
+x = 1:size(energies_cAR, 2);
+y1 = energies_cAR;
+plot(x,y1)
+title(sprintf("Ctl. AR energy"))
+xlabel('steps');
+ylabel('energy');
+
+subplot(2,1,2);
+y2 = energies_eAR;
+plot(x,y2)
+title(sprintf("Exp. AR energy"));
 xlabel('steps');
 ylabel('energy');
 
 % error
 figure
-x = 1:size(errors, 2);
-y1 = errors;
-plot(x,y)
-title(sprintf("error"))
+subplot(2,1,1)
+x = 1:size(errors_cAR, 2);
+y1 = errors_cAR;
+plot(x,y1)
+title(sprintf("Ctl. AR error"))
 xlabel('steps');
 ylabel('error');
+
+subplot(2,1,2);
+y2 = errors_eAR;
+plot(x,y2)
+title(sprintf("Exp. AR error"));
+xlabel('steps');
+ylabel('error');
+
+% free recall
+figure
+subplot(2,1,1)
+x = 1:size(energies_cFR, 2);
+y1 = energies_cFR;
+plot(x,y1)
+title(sprintf("Ctl. FR energy"))
+xlabel('steps');
+ylabel('energy');
+
+subplot(2,1,2);
+y2 = energies_eFR;
+plot(x,y2)
+title(sprintf("Exp. FR energy"));
+xlabel('steps');
+ylabel('energy');

@@ -5,6 +5,6 @@ function energy = get_energy(vk, hk, M, b, c) % seems to slow training down sign
             % joint = joint + vk(i)*hk(j)*M(i,j);
         % end
     % end
-    vhw = (vk*hk').*M;
+    vhw = (vk*hk').*M; % visible, hidden, weight product
     joint = sum(vhw, 'all');
     energy = - (dot(b,vk) + dot(c,hk) + joint);

@@ -1,7 +1,7 @@
-function [errors, energies] = test_label_input(M, cdk, b, c, x, i, state, nhidden, breadth)      
+function [errors, energies, valPred] = test_label_input(M, cdk, b, c, x, i, state, nhidden, breadth, T)      
     Nh = size(c, 1);
     Ni = size(b, 1);
-    sigmoid = @(a) 1.0 ./ (1.0 + exp(-a)); % sigmoid activation function (where a = energy)
+    sigmoid = @(a) 1.0 ./ (1.0 + (exp(-a)/T)); % sigmoid activation function (where a = energy)
     energies = [Inf];
     errors = [Inf];
     
@@ -39,7 +39,8 @@ function [errors, energies] = test_label_input(M, cdk, b, c, x, i, state, nhidde
         energies(end + 1) = sum(energy);
     end
     
-    valPred = sum(vk(785:812))/length(vk(785:812));
+    valPred = round(sum(vk(785:812))/length(vk(785:812)),4)*10; % predicted valence
+    
     nexttile
     imshow(reshape(v0(1:784), 28, 28)); % reshape test vector
     title(sprintf("img %i", i))

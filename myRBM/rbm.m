@@ -5,8 +5,8 @@ function [M, b, c, errors, energies] = rbm(epsilon, Ni, trImages, nhidden, maxEp
     %% train RBM
     % max_epochs = 5; % number of training epochs
     % epsilon = 0.001; % learning rate
-    alpha = 0.5; % momentum - unused
-    lambda = 1e-5; % regularization - unused
+    alpha = 0.5; % momentum - unused - probably will not use!
+    lambda = 1e-5; % regularization - unused, decays older weights - could use in training for "old/irrelevant" memories
     % cd_k = 2; % contrastive-divergence steps
     [M, b, c, errors, energies] = rbm_train(trImages, M, b, c, cdk, epsilon, maxEpochs);
     
@@ -42,7 +42,7 @@ function [M, b, c, errors, energies] = rbm(epsilon, Ni, trImages, nhidden, maxEp
     % figure
     % title('confusion matrix TS');
     % plotconfusion(tsLabels', tsPredY, sprintf('TS set - , alpha: %f lambda: %f', alpha, lambda));
-    
+
     %% hidden unit weights
     figure
     title(sprintf("Hidden unit weights"))
@@ -52,4 +52,5 @@ function [M, b, c, errors, energies] = rbm(epsilon, Ni, trImages, nhidden, maxEp
        imshow(reshape(M(:,i), 28, 28));
     end
     hold off
+    
 end

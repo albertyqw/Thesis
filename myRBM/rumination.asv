@@ -3,17 +3,17 @@
 loadData
 
 nhidden = 100; % number of hidden units - modulate - see Hinton's recipe
-epsilon = 0.005; % meets Hinton's guidelines, seems to be an okay value for our learning
+epsilon = 0.001; % meet's
 maxEpochs = 4; % number of training epochs
 cdk = 1; % contrastive-divergence steps
 
-cBreadth = 0.99; % % of neurons kept on for the control case
-eBreadth = 0.90; % """ for the experimental (trait rumination case)
-acdk = 160; % associative recall k-ste
-rcdk = 40; % rumination k-step
-rCycles = 4; % number of ruminative "cycles" (giving us 4*30=120 total k-steps)
+cBreadth = 0.99;
+eBreadth = 0.90;
+acdk = 100; % associative recall k-step
+rcdk = 30; % rumination k-step
+rCycles = 4;
 
-v0 = rand(Ni,1); % pure noisy input for rumination
+v0 = rand(Ni,1); % noisy input for rumination
 
 [M1, b1, c1, errors1, energies1] = rbm(epsilon, Ni, trImages, nhidden, maxEpochs, cdk);
 M2 = M1; % equalize training
@@ -27,7 +27,7 @@ title(sprintf("Weights heatmap"))
 heatmap(M1);
 %% recall tests
 % associative recall
-ts = [4,3,2,19,5,9,12,18,62,8]; % example images for 0:9
+ts = [4,3,2,19,5,9,12,18,62,8]; % examples from 0:9
 
 for i = 1:length(ts)
     [errors1a, energies1a] = test_input(M1, acdk, b1, c1, tsImages(ts(i),:)', i, "ctl.", nhidden, cBreadth); % do we need the second "i"?

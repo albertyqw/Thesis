@@ -10,6 +10,7 @@ function [M, b, c, errors, energies] = rbm_train(X, M, b, c, cd_k, epsilon, max_
 
     %% epochs
     while true
+        % initializing updater variables
         deltaM = zeros(Ni, Nh);
         deltab = zeros(Ni, 1);
         deltac = zeros(Nh ,1);
@@ -21,7 +22,7 @@ function [M, b, c, errors, energies] = rbm_train(X, M, b, c, cd_k, epsilon, max_
         
         % stochastic updates
         fprintf('-- training...\n');
-        for i = 1:Nd
+        for i = 1:Nd %/2 % cutting training size for tweaking purposes
             % k-step (cd_k) contrastive divergence
             [h0, v0, vk, hk] = rbm_contrastive_divergence(M, b, c, cd_k, X(i,:)');
             
@@ -58,7 +59,7 @@ function [M, b, c, errors, energies] = rbm_train(X, M, b, c, cd_k, epsilon, max_
         % mean error over tr samples
         errors(end + 1) = error / Nd;
 
-        % mean energy over tr samples
+        % total energy over tr samples
         energies(end + 1) = sum(energy);
 
         fprintf('- epoch %d, error: %f, energy: %f\n', e, errors(end), energies(end));
