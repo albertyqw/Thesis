@@ -1,4 +1,4 @@
-%% mood
+%% rumination model
 loadData
 
 nhidden = 100; % number of hidden units - modulate - see Hinton's recipe
@@ -42,11 +42,12 @@ trImagesL = [trImages, trValence];
 tsImagesL = [tsImages, tsValence]; 
 
 % train
-[M_c, b_c, c_c, errors_c, energies_c] = rbm_mood(epsilon, Ni+28, trImagesL, nhidden, maxEpochs, cdk); % Ni + 28 for labels 
+[M_c, b_c, c_c, errors_c, energies_c, tsPredY] = rbm_mood(epsilon, Ni+28, trImagesL, tsImagesL, trLabels, nhidden, maxEpochs, cdk); % Ni + 28 for labels 
 M_e = M_c; % equalize training
 b_e = b_c;
 c_e = c_c;
 errors_e = errors_c;
+valences = amygdala(tsPredY); % setting valences
 
 % weight heatmap
 figure
@@ -56,6 +57,8 @@ heatmap(M_c);
 % image reshape first 784
 ts = [4,3,2,19,5,9,12,18,62,8];
 
+mood = 0;
+
 pred_error_c = [];
 pred_error_e = [];
 
@@ -64,6 +67,7 @@ T_c = 1.1;
 
 figure
 for i = 1:length(ts)
+    mood = (mood + valences(ts(i)))/i; % mood
     [errors_cAR, energies_cAR, val_pred_c] = test_label_input(M_c, acdk, b_c, c_c, tsImagesL(ts(i),:), i, "ctl.", nhidden, cBreadth, T_c);
     [errors_eAR, energies_eAR, val_pred_e] = test_label_input(M_e, acdk, b_e, c_e, tsImagesL(ts(i),:), i, "exp.", nhidden, eBreadth, T_e);
     pred_error_c(end+1) = val_pred_c;

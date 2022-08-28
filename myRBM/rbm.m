@@ -10,14 +10,14 @@ function [M, b, c, errors, energies] = rbm(epsilon, Ni, trImages, nhidden, maxEp
     % cd_k = 2; % contrastive-divergence steps
     [M, b, c, errors, energies] = rbm_train(trImages, M, b, c, cdk, epsilon, maxEpochs);
     
-    %% encoding digits
-    % trImgCodes = rbm_encode(trImages, M, b, c); % activate neurons, returns hidden neurons
-    % tsImgCodes = rbm_encode(tsImages, M, b, c);
+    %% encoding digits - amygdala valence
+    trImgCodes = rbm_encode(trImages, M, b, c); % activate neurons, returns hidden neurons
+    tsImgCodes = rbm_encode(tsImages, M, b, c);
     
     %% training softmax layer (to classify hidden unit activations)
-    % softmax = trainSoftmaxLayer(trImgCodes', trLabels', 'MaxEpochs', 1000); % MATLAB function
-    % trPredY = softmax(trImgCodes');
-    % tsPredY = softmax(tsImgCodes');
+    softmax = trainSoftmaxLayer(trImgCodes', trLabels', 'MaxEpochs', 1000); % MATLAB function
+    trPredY = softmax(trImgCodes');
+    tsPredY = softmax(tsImgCodes');
     
     %% error plot
     figure

@@ -1,4 +1,4 @@
-function [errors, energies, valPred] = test_label_input(M, cdk, b, c, x, i, state, nhidden, breadth, T)      
+function [errors, energies, valPred] = test_label_input(M, cdk, b, c, x, i, state, nhidden, breadth, T, mood)      
     Nh = size(c, 1);
     Ni = size(b, 1);
     sigmoid = @(a) 1.0 ./ (1.0 + (exp(-a)/T)); % sigmoid activation function (where a = energy)
@@ -16,7 +16,7 @@ function [errors, energies, valPred] = test_label_input(M, cdk, b, c, x, i, stat
     hk = h0;
 
     % breadth control
-    neuronsOff = randperm(nhidden, int16(nhidden*(1-breadth))); % random permutation of breadth % neurons to turn off
+    neuronsOff = randperm(nhidden, int16(nhidden*(1-breadth)+mood)); % random permutation of breadth % neurons to turn off
     neuronsOff = sort(neuronsOff); % order ascending
 
     % negative phase
@@ -47,5 +47,5 @@ function [errors, energies, valPred] = test_label_input(M, cdk, b, c, x, i, stat
 
     nexttile
     imshow(reshape(vk(1:784), 28, 28)); % reshape visible layer
-    title(sprintf("pred. valence %f", valPred))
+    title(sprintf("pred. val.: %f, mood: %f", valPred, mood))
 end
