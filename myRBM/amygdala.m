@@ -1,10 +1,6 @@
-function [valences] = amygdala(tsPredY)
+function [valences] = amygdala(tsPredY) % converts softmax image to valence
     valences = [];
     for b = 1:size(tsPredY, 2)
-        valence = 0;
-        for a = 1:size(tsPredY, 1)
-            valence = valence + tsPredY(a,b)*(a-5.5); % scale around 0    
-        end
-        valences(end+1) = valence;
+        valences(end+1) = dot(tsPredY(:,b), 2*([0:9]-4.5)); % scale around [-9,9], heavier weighting going to extreme values
     end
 end

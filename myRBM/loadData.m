@@ -12,6 +12,3 @@ tsLabels = one_hot(tsLabels, 10);
 
 Nd = size(trImages, 1); % num vectors
 Ni = size(trImages, 2); % num inputs
-
-
-
