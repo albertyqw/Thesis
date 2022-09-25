@@ -4,7 +4,7 @@ function energies = dFR(M, cdk, b, c, v0, nhidden, breadth, cycles, T, mood, d, 
 
     T = T+(0.02*mood); % adjust T by mood
     sigmoid = @(a) 1.0 ./ (1.0 + (exp(-a)/T)); % sigmoid activation function (where a = energy)
-    energies = zeros(1,320); % rough maximum
+    energies = zeros(1,150); % rough maximum
     energies(1) = [Inf];
 
     % clamp training vector to random init image
@@ -25,7 +25,7 @@ function energies = dFR(M, cdk, b, c, v0, nhidden, breadth, cycles, T, mood, d, 
     index = 0;
     for i = 1:cycles % ruminative cycles
         % breadth control
-        neuronsOff = randperm(nhidden, int16(nhidden*(1-breadth)+mood(end))); % random permutation of breadth % neurons to turn off
+        neuronsOff = randperm(nhidden, int16(nhidden*(1-breadth)-mood(end))); % random permutation of breadth % neurons to turn off
         neuronsOff = sort(neuronsOff); % order ascending
 
         % negative phase
@@ -34,7 +34,7 @@ function energies = dFR(M, cdk, b, c, v0, nhidden, breadth, cycles, T, mood, d, 
             % update visible units to get reconstruction
             p_vkhk = sigmoid(M * hk + b); % backward: probability of visible | hidden
             vk = p_vkhk > rand(Ni, 1); % increased probabilistic, assumption: more stochastic recall - turn off for a more continous output
-    
+
             % update hidden units again
             p_hkvk = sigmoid(M' * vk + c); % forward: probability of hidden | visible
             hk = p_hkvk > rand(Nh,1);
@@ -46,15 +46,17 @@ function energies = dFR(M, cdk, b, c, v0, nhidden, breadth, cycles, T, mood, d, 
             index = index + 1;
             energies(index) = sum(energy);
         end
-        
+
+        vk = double(vk); % convert for labelling
+
         if i == d
-            vk(785:812) = ones(size(vk(785:812))) * dis; % mood lift distraction
+            vk(785:812) = repelem(dis, 28); % mood lift distraction: label of [dis] valence
         end
-        
-        imPred = sum(vk(785:812))/length(vk(785:812))*10; % predicted image
+              
+        imPred = 10*sum(vk(785:812))/length(vk(785:812)); % predicted image
         valPred = 2*(imPred-4.5); % predicted valence (still scaled [-9,9])
 
-        mood(end+1) = 0.4*mood(end) + 0.1*valPred; % 80% prior mood + 20% predicted valence
+        mood(end+1) = 0.4*mood(end) + 0.6*valPred;
         cdk = mood_bias(mood(end), valPred, cdk); % can stack continuously here
         
         nexttile

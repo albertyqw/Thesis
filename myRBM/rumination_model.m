@@ -3,7 +3,7 @@
 
 loadData % load / prep MNIST dataset
 
-nhidden = 144; % number of hidden units - modulate - see Hinton's recipe
+nhidden = 144; % see Hinton's recipe
 epsilon = 0.005; % meets Hinton's guidelines, seems to be an okay value for our learning
 maxEpochs = 6; % 6 doesn't completely settle, but we don't want to overfit
 cdk = 1; % contrastive-divergence steps for training

@@ -49,7 +49,7 @@ function [M,b,c, errors, energies, tsPredY] = rbm_mood(epsilon, Ni, trImages, ts
     figure
     hold on
     for i=1:nhidden
-       subplot(12, 12, i);
+       subplot(22, 22, i); % up from 12x12
        imshow(reshape(M(1:812,i), 28, 29));
        %title(sprintf('unit %d', i));
     end

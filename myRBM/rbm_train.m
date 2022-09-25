@@ -22,7 +22,7 @@ function [M, b, c, errors, energies] = rbm_train(X, M, b, c, cd_k, epsilon, max_
         
         % stochastic updates
         fprintf('-- training...\n');
-        for i = 1:Nd %/2 % cutting training size for tweaking purposes
+        for i = 1:Nd
             % k-step (cd_k) contrastive divergence
             [h0, v0, vk, hk] = rbm_contrastive_divergence(M, b, c, cd_k, X(i,:)');
             

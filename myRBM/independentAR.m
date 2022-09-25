@@ -2,8 +2,8 @@
 
 ts = [4,3,2,19,5,9,12,18,62,8]; % samples digits 0:9 for associative recall
 
-cBreadth = 0.90; % 0.90 % of neurons kept on for the control case
-eBreadth = 0.80; % 0.80 """ for the experimental (trait rumination case)
+cBreadth = 0.95; % 0.95 % of neurons kept on for the control case
+eBreadth = 0.90; % 0.90 """ for the experimental (trait rumination case)
 
 aCycles = 3; % number of AR sampling points
 acdk_c = 80; % associative recall k-steps / cycle
@@ -34,23 +34,29 @@ mood_c = 0;
 mood_e = 0;
 
 % AR test
+% control
 figure
+title(sprintf("Ctl. Independent AR"))
 for i = 1:length(ts)
     [error_cAR, energy_cAR, imPred_c] = AR(M_c, acdk_c, b_c, c_c, tsImagesL(ts(i),:), tsValences(ts(i))*10, ...
         "ctl.", nhidden, cBreadth, aCycles, T_c, mood_c);
-    [error_eAR, energy_eAR, imPred_e] = AR(M_e, acdk_e, b_e, c_e, tsImagesL(ts(i),:), tsValences(ts(i))*10, ...
-        "exp.", nhidden, eBreadth, aCycles, T_e, mood_e);
 
     % adding statistics to matrix
-    errors_cAR = [errors_cAR; error_cAR]; 
+    errors_cAR = [errors_cAR; error_cAR];
     energies_cAR = [energies_cAR; energy_cAR];
-    errors_eAR = [errors_eAR; error_eAR];
-    energies_eAR = [energies_eAR; energy_eAR];
 
     pred_error_c(end+1) = imPred_c;
-    pred_error_e(end+1) = imPred_e;
 end
 
+figure
+title(sprintf("Exp. Independent AR"))
+for i = 1:length(ts)
+    [error_eAR, energy_eAR, imPred_e] = AR(M_e, acdk_e, b_e, c_e, tsImagesL(ts(i),:), tsValences(ts(i))*10, ...
+        "exp.", nhidden, eBreadth, aCycles, T_e, mood_e);
+    errors_eAR = [errors_eAR; error_eAR];
+    energies_eAR = [energies_eAR; energy_eAR];
+    pred_error_e(end+1) = imPred_e;
+end
 %% results
 % "prediction" error
 ave_pred_error_c = (sum(abs([0:9]-pred_error_c)))/10;

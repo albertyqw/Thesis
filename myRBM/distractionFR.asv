@@ -9,7 +9,7 @@ energy_eFR = [];
 energies_cFR = [];
 energies_eFR = [];
 
-d = 4; % distractor point
+d = 4; % disractor point
 dis = [0, 0.5, 0.9];
 
 figure

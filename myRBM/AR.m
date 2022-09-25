@@ -22,7 +22,7 @@ function [errors, energies, imPred] = AR(M, cdk, b, c, x, label ...
     hk = h0;
 
     % breadth control
-    neuronsOff = randperm(nhidden, int16(nhidden*(1-breadth)+mood)); % random permutation of % neurons to turn off - accounting for mood
+    neuronsOff = randperm(nhidden, int16(nhidden*(1-breadth)-mood)); % random permutation of % neurons to turn off - accounting for mood
     neuronsOff = sort(neuronsOff); % order ascending
 
     nexttile

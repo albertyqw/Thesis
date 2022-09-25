@@ -1,6 +1,6 @@
 %% free recall
-rcdk = 40; % # k-steps per free recall
-rCycles = 6; % number of ruminative "cycles" (giving us 4*30=120 total k-steps)
+rcdk = 20; % # down from 40 k-steps per free recall
+rCycles = 6; % number of ruminative "cycles"
 
 figure
 moods = [0,-2,-5,-9]; % try starting moods

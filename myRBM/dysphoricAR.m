@@ -2,11 +2,11 @@
 
 ts_dys = [2,36,39,44,48,1,18,27,35,37]; % samples 2s then 7s, dysphoric induction followed by mood lifting
 
-mood_c = zeros(length(ts)+1); % control and experimental mood calculation
-mood_e = zeros(length(ts)+1);
+mood_c = zeros(length(ts_dys)+1); % control and experimental mood calculation
+mood_e = zeros(length(ts_dys)+1);
 
-cBreadth = 0.90; % 0.90 % of neurons kept on for the control case
-eBreadth = 0.80; % 0.80 """ for the experimental (trait rumination case)
+cBreadth = 0.95; % 0.95 % of neurons kept on for the control case
+eBreadth = 0.90; % 0.90 """ for the experimental (trait rumination case)
 
 aCycles = 3; % number of AR sampling points
 
@@ -54,7 +54,7 @@ for i = 1:length(ts_dys)
 
     valPred_c = (imPred_c - 4.5)*2; % derive valence prediction
 
-    mood_c(end+1) = 0.4 * mood_c(end) + 0.1 * (0.75 * valPred_c + 0.25 * est_tsValences(ts_dys(i))); % 80% prior mood + weighted average of (15%) input and (5%) interpreted valence
+    mood_c(end+1) = 0.4 * mood_c(end) + 0.6 * (0.75 * valPred_c + 0.25 * est_tsValences(ts_dys(i))); % 80% prior mood + weighted average of (15%) input and (5%) interpreted valence
 
     % adding statistics to matrix
     errors_cAR = [errors_cAR, error_cAR];
@@ -70,7 +70,7 @@ for i = 1:length(ts_dys)
     [error_eAR, energy_eAR, imPred_e] = AR(M_e, acdk_e, b_e, c_e, tsImagesL(ts_dys(i),:), tsValences(ts_dys(i))*10, ...
         "exp.", nhidden, eBreadth, aCycles, T_e, mood_e(end));
     valPred_e = (imPred_e - 4.5)*2;
-    mood_e(end+1) = 0.4 * mood_e(end) + 0.1 * (0.75 * valPred_e + 0.25 * est_tsValences(ts_dys(i)));
+    mood_e(end+1) = 0.4 * mood_e(end) + 0.6 * (0.75 * valPred_e + 0.25 * est_tsValences(ts_dys(i)));
 
     errors_eAR = [errors_eAR, error_eAR];
     energies_eAR = [energies_eAR, energy_eAR];

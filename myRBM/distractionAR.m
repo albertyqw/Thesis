@@ -39,19 +39,26 @@ for i = 1:length(ts)
     % dAR is the only change from independent AR
     [error_cAR, energy_cAR, imPred_c] = dAR(M_c, acdk_c, b_c, c_c, tsImagesL(ts(i),:), tsValences(ts(i))*10, ...
         "ctl.", nhidden, cBreadth, aCycles, T_c, mood_c);
-    [error_eAR, energy_eAR, imPred_e] = dAR(M_e, acdk_e, b_e, c_e, tsImagesL(ts(i),:), tsValences(ts(i))*10, ...
-        "exp.", nhidden, eBreadth, aCycles, T_e, mood_e);
 
     % adding statistics to matrix
     errors_cAR = [errors_cAR; error_cAR];
     energies_cAR = [energies_cAR; energy_cAR];
+
+    pred_error_c(end+1) = imPred_c;
+end
+
+figure
+for i = 1:length(ts)
+    % dAR is the only change from independent AR
+    [error_eAR, energy_eAR, imPred_e] = dAR(M_e, acdk_e, b_e, c_e, tsImagesL(ts(i),:), tsValences(ts(i))*10, ...
+        "exp.", nhidden, eBreadth, aCycles, T_e, mood_e);
+
+    % adding statistics to matrix
     errors_eAR = [errors_eAR; error_eAR];
     energies_eAR = [energies_eAR; energy_eAR];
 
-    pred_error_c(end+1) = imPred_c;
     pred_error_e(end+1) = imPred_e;
 end
-
 %% results
 % "prediction" error
 ave_pred_error_c = (sum(abs([0:9]-pred_error_c)))/10;
