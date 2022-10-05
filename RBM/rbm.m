@@ -12,17 +12,17 @@ tsLabels = one_hot(tsLabels, 10);
 
 Nd = size(trImages, 1); % num vectors
 Ni = size(trImages, 2); % num inputs
-
 %% initialize RBM
 nhidden = 100; % number of hidden units
 [M, b, c] = rbm_init(Ni, nhidden); % weights, biases
 
-%% train RBM
+%% hyperparameterize + train RBM
 max_epochs = 4; % number of training epochs
 epsilon = 0.001; % learning rate
 alpha = 0.5; % momentum - unused
 lambda = 1e-5; % regularization - unused
 k = 1; % contrastive-divergence steps
+
 [M, b, c, errors] = rbm_train(trImages, M, b, c, k, epsilon, alpha, lambda, max_epochs);
 
 %% encoding digits
